@@ -1296,11 +1296,7 @@ export default Details
 
 ### App #10
 
-Create an app that has two routes (using `react-router-dom`, which you will have to install via `npm i react-router-dom`.)
-
- If you decide to complete `app-10` with class based components, you will *need* to use `react-router-dom V5`, using the command `npm i react-router-dom@5.1`.
-
-The routes in this app are as follows:
+Create an app that has two routes (using `react-router-dom`, which you will have to install via `npm i react-router-dom`):
 
 - Component name: `Products`, Component route: `'/'`
 - Component name: `Details`, Component route: `'/details/:id'`
@@ -1434,40 +1430,44 @@ export default Products;
 ```js
 import React, { Component } from "react";
 import axios from "axios";
+import {useParams} from 'react-router-dom'
 
-class Details extends Component {
-  constructor() {
-    super();
-
-    this.state = {
-      item: {}
-    };
-  }
-
-  componentDidMount() {
-    axios
-      .get(
-        `https://practiceapi.devmountain.com/products/${
-          this.props.match.params.id
-        }`
-      )
-      .then(response => {
-        this.setState({ item: response.data });
-      });
-  }
-
-  render() {
-    return (
-      <div>
-        <h2>{this.state.item.title}</h2>
-        <img width="200" src={this.state.item.image} />
-        <h4>{`Price: $${this.state.item.price}.00`}</h4>
-      </div>
-    );
+export function withRouter(Children) {
+  return(props)=>{
+      const match = {params: useParams()};
+      return <Children {...props} match={match} />
   }
 }
 
-export default Details;
+class Details extends Component {
+  constructor() {
+      super();
+      
+      this.state = {
+          item: {}
+      }
+  }
+  
+  componentDidMount() {
+      const id = this.props.match.params.id;
+      axios.get(`https://practiceapi.devmountain.com/products/${id}`)
+      .then(res => {
+          this.setState({ item: res.data });
+      });
+  }
+  
+  render() {
+      return(
+          <div>
+              <h2>{this.state.item.title}</h2>
+              <img width="200" src={this.state.item.image} />
+              <h4>{`Price: $${this.state.item.price}.00`}</h4>
+          </div>
+      );
+  }
+}
+
+export default withRouter(Details);
 ```
 
 </details>
